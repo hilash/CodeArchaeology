@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if projects %}
+
+{% if view_mode == 'table' %}
+
+<!-- Gmail-style Action Bar -->
+<form method="post" action="/delete-bulk" id="bulk-delete-form">
+    <div class="gmail-action-bar">
+        <button type="button" class="gmail-action-btn" onclick="window.location.href='/'">Archive</button>
+        <button type="button" class="gmail-action-btn" onclick="window.location.href='/'">Report Spam</button>
+        <button type="submit" class="gmail-action-btn danger" onclick="return confirm('Delete ' + document.querySelectorAll('input[name=selected]:checked').length + ' selected projects?');">Delete</button>
+        <select class="gmail-actions-select" onchange="if(this.value){window.location.href=this.value;this.selectedIndex=0;}">
+            <option value="">More actions...</option>
+            <option value="/?sort=newest&view=table">Sort Newest</option>
+            <option value="/?sort=oldest&view=table">Sort Oldest</option>
+            <option value="/?view=grid">Grid View</option>
+        </select>
+        <span class="gmail-select-links">
+            Select: <a href="#" onclick="document.querySelectorAll('input[name=selected]').forEach(c=>c.checked=true);return false;">All</a>,
+            <a href="#" onclick="document.querySelectorAll('input[name=selected]').forEach(c=>c.checked=false);return false;">None</a>,
+            <a href="#" onclick="document.querySelectorAll('input[name=selected]').forEach(c=>c.checked=!c.checked);return false;">Read</a>,
+            <a href="#" onclick="return false;">Unread</a>,
+            <a href="/?notes=has_notes&view=table">Starred</a>,
+            <a href="/?view=table">Unstarred</a>
+        </span>
+        <span class="gmail-pager">
+            <b>1 - {{ projects|length }}</b> of <b>{{ projects|length }}</b>
+            &nbsp;
+            <a href="/">Refresh</a>
+        </span>
+    </div>
+
+    <!-- Inbox Table -->
+    <table class="gmail-inbox">
+        <tbody>
+            <!-- Intro draft email -->
+            <tr class="project-row intro-row row-expanded" id="intro-row" onclick="toggleIntro()">
+                <td class="col-check"></td>
+                <td class="col-star"><span class="star starred">&#9733;</span></td>
+                <td class="col-from" style="color:var(--gmail-red);font-weight:bold;">Draft</td>
+                <td class="col-subject">
+                    <span class="label-tag">personal</span>
+                    <span class="label-tag">memoir</span>
+                    <span class="subject-text">20 Years of //TODO: My Code Archiology</span>
+                    <span class="snippet"> - ~claude code scanned my gmail inbox and extracted any piece of code I wrote...</span>
+                </td>
+                <td class="col-attachment"></td>
+                <td class="col-date">2026-02-26</td>
+            </tr>
+            <tr class="detail-row intro-detail" id="intro-detail">
+                <td colspan="6">
+                    <div class="intro-email-body">
+                        <div class="email-sender-bar" style="padding:10px 14px 8px;">
+                            <div class="email-sender-left">
+                                <span class="email-sender-avatar" style="background:#F4C542;color:#B8860B;">H</span>
+                                <div class="email-sender-info">
+                                    <div class="email-sender-name"><strong>Hila Shmuel</strong> <span class="email-sender-to">(Draft)</span></div>
+                                    <div class="email-sender-subject">20 Years of //TODO: My Code Archiology</div>
+                                </div>
+                            </div>
+                            <div class="email-date">Feb 26, 2026</div>
+                        </div>
+                        <div class="intro-email-content">
+                            <p><em>~claude code scanned my gmail inbox and extracted any piece of code I wrote and created my 20 years of code archeology.~</em></p>
+
+                            <p>I wrote my first line of code in 2006 when I was 14 year old.
+My first program ever was saved as a draft on my Gmail. Back in 2006 Github or Dropbox was yet to be invented so the history of my keystrokes has been stored in over 200+ emails in my gmail account.
+My first program was a 9 lines C-program printing a man using ascii art:</p>
+
+                            <pre class="gmail-intro-code">  O
+--|--
+  |
+ _|_</pre>
+
+                            <p>And it was&hellip; magic.</p>
+
+                            <p>So, I grew up, and yet, I continued to code, and maybe out of a habit, to save some of my code in my gmail.
+I recently talked with a friend who told me he ran a pascal program he wrote on his 3rd grade. And that send me back to memory lane and I thought &mdash; I can do it too. Let's use Claude Code, google gmail api, and check what traces I've left. And so it was.</p>
+
+                            <p>My gmail inbox contained 225 projects across 20 years,
+with 17 programming languages.
+C, C++, Pascal, Assembly, Prolog, Java, C#, MATLAB, SQL, Python, JavaScript, HTML, and much more.
+What a magnificent way.
+From recursion to game dev to audio processing and writing FFT code myself, all of it sitting quietly in my Gmail, waiting to be found.
+My history from learning to code, finding my first Job, participating in the computer science Olympics for teens, solving math riddles in Project Euler, and on and on.</p>
+
+                            <p>That code was me.
+Every keystroke was a neuron firing in my brain, translated into my fingers pressing the keyboard and creating keyboard interrupt, then magically appear on screen, and when I clicked run the translation of thoughts had transformed into pure logic.</p>
+
+                            <p>I feel like all of us developers can see our old code and FEEL. These characters are the hours long I spend writing each function, debugging, researching libraries, feeling genius when I was onto something. They are way more than files. They are gems of curiosity, these are precious memories of the girl I used to be and the engineer I have became.</p>
+
+                            <p>I am emotional writing this (and it's me, not an AI), cause&hellip; cause I feel that I'm closing a chapter.
+A very big chapter in my life.
+For quite some time now I'm no longer coding, but writing in plain English in Claude Code. I'm using my knowledge gained thought the years to instruct the LLM how to execute my wishes better, advise on architecture, prevent catastrophical mistakes. I'm having so much fun creating and project in a lightspeed, yet I feel that&hellip; some of the magic is&hellip; lost.</p>
+
+                            <p>Here is to all of you, my brothers and sisters, coders who sweated on their keyboards and created worlds. Slowly.</p>
+
+                            <div class="memoir-cta">
+                                <p>Want to explore your own 20 years of code? <a href="/skill" class="skill-btn-rainbow">Download the Code Archaeology Skill</a> for Claude Code and dig through your Gmail.</p>
+                                <p>I'd love to hear your story &mdash; find me on <a href="https://x.com/HilaShmuel" target="_blank">X @HilaShmuel</a> or <a href="https://www.linkedin.com/in/hilash/" target="_blank">LinkedIn</a>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+
+            {% for project in projects %}
+            <tr class="project-row" data-name="{{ project.name }}">
+                <td class="col-check"><input type="checkbox" name="selected" value="{{ project.name }}" onclick="event.stopPropagation();"></td>
+                <td class="col-star"><span class="star{% if project.notes %} starred{% endif %}" onclick="event.stopPropagation();">&#9733;</span></td>
+                <td class="col-from">
+                    {% if project.enrichment and project.enrichment.category %}{{ project.enrichment.category }}{% else %}Draft{% endif %}
+                </td>
+                <td class="col-subject">
+                    {% if project.enrichment and project.enrichment.topics %}
+                        {% for topic in project.enrichment.topics[:2] %}
+                        <span class="label-tag">{{ topic }}</span>
+                        {% endfor %}
+                    {% endif %}
+                    <span class="subject-text">{% if project.enrichment and project.enrichment.clean_title %}{{ project.enrichment.clean_title }}{% else %}{{ project.name.split('_', 1)[1].replace('-', ' ').title() if '_' in project.name else project.name }}{% endif %}</span>
+                    <span class="snippet"> - {% if project.enrichment and project.enrichment.summary %}{{ project.enrichment.summary[:80] }}{% elif project.emails and project.emails[0].body %}{{ project.emails[0].body[:80]|e }}{% endif %}</span>
+                </td>
+                <td class="col-attachment">{% if project.files|length > 1 %}&#128206;{% endif %}</td>
+                <td class="col-date">{{ project.name.split('_')[0] if '_' in project.name else '?' }}</td>
+            </tr>
+            <tr class="detail-row" id="detail-{{ loop.index }}" style="display:none;">
+                <td colspan="6">
+                    <div class="detail-panel">
+                        <div class="detail-loading">Loading...</div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Bottom Action Bar -->
+    <div class="gmail-action-bar">
+        <button type="button" class="gmail-action-btn" onclick="window.location.href='/'">Archive</button>
+        <button type="button" class="gmail-action-btn" onclick="window.location.href='/'">Report Spam</button>
+        <button type="submit" class="gmail-action-btn danger" onclick="return confirm('Delete selected?');">Delete</button>
+        <select class="gmail-actions-select">
+            <option value="">More actions...</option>
+        </select>
+        <span class="gmail-select-links">
+            Select: <a href="#" onclick="document.querySelectorAll('input[name=selected]').forEach(c=>c.checked=true);return false;">All</a>,
+            <a href="#" onclick="document.querySelectorAll('input[name=selected]').forEach(c=>c.checked=false);return false;">None</a>,
+            <a href="#" onclick="return false;">Read</a>,
+            <a href="#" onclick="return false;">Unread</a>,
+            <a href="/?notes=has_notes&view=table">Starred</a>,
+            <a href="/?view=table">Unstarred</a>
+        </span>
+        <span class="gmail-pager">
+            <b>1 - {{ projects|length }}</b> of <b>{{ projects|length }}</b>
+        </span>
+    </div>
+</form>
+
+{% else %}
+
+<!-- Grid View (fallback) -->
+<div class="gmail-action-bar">
+    <span class="gmail-pager">
+        <b>{{ projects|length }}</b> projects
+        &nbsp; | &nbsp;
+        <a href="/?view=table">Switch to Inbox View</a>
+    </span>
+</div>
+
+<div class="project-grid">
+    {% for project in projects %}
+    <div class="project-card-wrapper">
+        <a href="/project/{{ project.name }}" class="project-card">
+            <div class="card-header">
+                <span class="date">{{ project.name.split('_')[0] if '_' in project.name else '?' }}</span>
+                {% if project.notes %}
+                <span class="notes-indicator" title="Has notes">&#9998;</span>
+                {% endif %}
+            </div>
+            <h3>{% if project.enrichment and project.enrichment.clean_title %}{{ project.enrichment.clean_title }}{% else %}{{ project.name.split('_', 1)[1].replace('-', ' ').title() if '_' in project.name else project.name }}{% endif %}</h3>
+            <div class="tags">
+                {% if project.enrichment and project.enrichment.topics %}
+                    {% for topic in project.enrichment.topics[:4] %}
+                    <span class="tag topic-tag">{{ topic }}</span>
+                    {% endfor %}
+                {% else %}
+                    {% for lang in project.languages[:4] %}
+                    <span class="tag">{{ lang }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <div class="file-count">{{ project.files|length }} file{{ 's' if project.files|length != 1 }}</div>
+            {% if project.notes %}
+            <p class="desc notes-preview">{{ project.notes[:120]|e }}{% if project.notes|length > 120 %}...{% endif %}</p>
+            {% elif project.enrichment and project.enrichment.summary %}
+            <p class="desc">{{ project.enrichment.summary[:150]|e }}{% if project.enrichment.summary|length > 150 %}...{% endif %}</p>
+            {% elif project.emails and project.emails[0].body %}
+            <p class="desc">{{ project.emails[0].body[:120]|e }}{% if project.emails[0].body|length > 120 %}...{% endif %}</p>
+            {% endif %}
+        </a>
+        <form class="delete-form" method="post" action="/delete/{{ project.name }}" onsubmit="return confirm('Delete this project?');">
+            <button type="submit" class="delete-btn" title="Delete project">&times;</button>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+
+{% endif %}
+
+{% else %}
+<div class="empty-state">
+    <h2>No projects found</h2>
+    <p>Run <code>python -m src.main fetch</code> to download code from your Gmail.</p>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function toggleIntro() {
+    var row = document.getElementById('intro-row');
+    var detail = document.getElementById('intro-detail');
+    if (detail.style.display === 'none') {
+        detail.style.display = 'table-row';
+        row.classList.add('row-expanded');
+    } else {
+        detail.style.display = 'none';
+        row.classList.remove('row-expanded');
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gmail - 20 Years of //TODO{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Top Navigation Strip -->
+    <div class="gmail-topnav">
+        <div class="gmail-topnav-left">
+            <a href="/">Google</a>
+            <span class="sep">|</span>
+            <a href="/"><b>Gmail</b></a>
+            <span class="sep">|</span>
+            <a href="/">Calendar</a>
+            <span class="sep">|</span>
+            <a href="/">Code Archaeology</a>
+            <span class="sep">|</span>
+            <a href="/skill" class="skill-btn-rainbow">Download Skill &darr;</a>
+        </div>
+        <div class="gmail-topnav-right">
+            20 Years of <b style="color:#CC0000;">//TODO</b>
+            <a href="/">Settings</a>
+            <a href="/">Help</a>
+        </div>
+    </div>
+
+    <!-- Header: Logo + Search -->
+    <div class="gmail-header">
+        <a href="/" class="gmail-logo">
+            <span class="gmail-logo-img">
+                <span class="gmail-logo-google"><span class="g1">G</span><span class="g2">o</span><span class="g3">o</span><span class="g4">g</span><span class="g5">l</span><span class="g6">e</span></span><span class="gmail-logo-mail"> Mail</span>
+            </span>
+            <span class="gmail-beta">BETA</span>
+        </a>
+        <span class="gmail-page-title">20 Years of <span style="color:#CC0000;font-weight:bold;">//TODO</span></span>
+        {% block search_bar %}
+        <div class="gmail-search">
+            <form method="get" action="/" style="display:flex;align-items:center;gap:4px;">
+                <input type="text" name="q" value="{{ query|default('') }}" placeholder="">
+                <input type="hidden" name="view" value="{{ view_mode|default('table') }}">
+                <button type="submit" class="gmail-search-btn">Search Mail</button>
+                <span class="gmail-search-links">
+                    <a href="/">Show search options</a>
+                </span>
+            </form>
+        </div>
+        {% endblock %}
+    </div>
+
+    <!-- Main Layout -->
+    <div class="gmail-layout">
+        <!-- Left Sidebar -->
+        <div class="gmail-sidebar">
+            <a href="/" class="gmail-compose-link">Compose Mail</a>
+
+            <ul class="gmail-nav-list">
+                <li class="active"><a href="/">Inbox <span class="gmail-nav-count">({{ project_count|default(0) }})</span></a></li>
+                <li><a href="/?sort=newest&view=table">Starred &#9734;</a></li>
+                <li><a href="/?notes=has_notes&view=table">Sent Mail</a></li>
+                <li><a href="/?sort=oldest&view=table">All Mail</a></li>
+                <li><a href="/">Spam</a></li>
+                <li><a href="/">Trash</a></li>
+            </ul>
+
+            {% block sidebar_extra %}
+            {% if all_languages is defined or all_categories is defined %}
+            <div class="gmail-sidebar-heading">Labels</div>
+            {% if all_languages is defined %}
+            <form method="get" action="/" id="lang-filter-form" style="margin:0;">
+                <input type="hidden" name="q" value="{{ query|default('') }}">
+                <input type="hidden" name="view" value="{{ view_mode|default('table') }}">
+                <input type="hidden" name="sort" value="{{ sort_order|default('newest') }}">
+                <select name="lang" class="gmail-filter-select" onchange="this.form.submit()">
+                    <option value="">All Languages</option>
+                    {% for lang in all_languages %}
+                    <option value="{{ lang }}" {{ 'selected' if lang_filter == lang }}>{{ lang }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+            {% endif %}
+            {% if all_categories is defined %}
+            <form method="get" action="/" id="cat-filter-form" style="margin:0;">
+                <input type="hidden" name="q" value="{{ query|default('') }}">
+                <input type="hidden" name="view" value="{{ view_mode|default('table') }}">
+                <input type="hidden" name="sort" value="{{ sort_order|default('newest') }}">
+                <select name="cat" class="gmail-filter-select" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    {% for cat in all_categories %}
+                    <option value="{{ cat }}" {{ 'selected' if cat_filter == cat }}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+            {% endif %}
+            {% endif %}
+            {% endblock %}
+
+            <div class="gmail-sidebar-heading">Contacts</div>
+            <div class="gmail-sidebar-sub">
+                <a href="/">Quick Contacts</a>
+            </div>
+
+            <div class="gmail-sidebar-heading">Invite a friend</div>
+            <div class="gmail-sidebar-sub" style="color:var(--gmail-muted);font-size:11px;">
+                Give to:
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="gmail-main">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="gmail-footer">
+        <div class="gmail-footer-storage">You are currently browsing {{ project_count|default(0) }} projects across 20 years.</div>
+        <div class="gmail-footer-links">
+            Gmail view: <b>standard with code</b> | <a href="/?view=grid">grid view</a> | <a href="/?view=table">table view</a>
+        </div>
+        <div>&copy;2006 Google</div>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

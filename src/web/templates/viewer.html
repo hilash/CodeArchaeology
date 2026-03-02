@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}{{ file_info.filename }} - Gmail{% endblock %}
+
+{% block extra_head %}
+<style>{{ pygments_css }}</style>
+{% endblock %}
+
+{% block search_bar %}
+<div class="gmail-search">
+    <form method="get" action="/" style="display:flex;align-items:center;gap:4px;">
+        <input type="text" name="q" value="" placeholder="">
+        <button type="submit" class="gmail-search-btn">Search Mail</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block sidebar_extra %}
+{% endblock %}
+
+{% block content %}
+<div class="gmail-detail-container">
+
+<a href="/project/{{ project.name }}" class="back-link">&laquo; Back to {{ project.name.split('_', 1)[1].replace('-', ' ').title() if '_' in project.name else project.name }}</a>
+
+<div class="viewer-header">
+    <h1>{{ file_info.filename }}</h1>
+    <div class="viewer-meta">
+        <span class="tag">{{ language }}</span>
+        <span>{{ (file_info.size / 1024)|round(1) }} KB</span>
+        {% if runnable %}
+        <button id="run-btn" class="gmail-action-btn" onclick="runCode()">&#9654; Run Code</button>
+        {% endif %}
+    </div>
+</div>
+
+{% if is_image %}
+<div class="image-viewer">
+    <img src="/raw/{{ project.name }}/{{ file_info.filename }}" alt="{{ file_info.filename }}">
+</div>
+{% elif binary %}
+<div class="binary-notice">
+    <p>Binary file &mdash; cannot display contents.</p>
+    <p>Size: {{ (file_info.size / 1024)|round(1) }} KB</p>
+</div>
+{% else %}
+<div class="code-container">
+    {{ highlighted|safe }}
+</div>
+{% endif %}
+
+{% if runnable %}
+<div id="output-panel" class="output-panel" style="display: none;">
+    <h3>Output</h3>
+    <div id="output-status" class="output-status"></div>
+    <pre id="output-stdout" class="output-stdout"></pre>
+    <pre id="output-stderr" class="output-stderr"></pre>
+</div>
+{% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+{% if runnable %}
+<script>
+function runCode() {
+    const btn = document.getElementById('run-btn');
+    const panel = document.getElementById('output-panel');
+    const status = document.getElementById('output-status');
+    const stdout = document.getElementById('output-stdout');
+    const stderr = document.getElementById('output-stderr');
+
+    btn.disabled = true;
+    btn.textContent = 'Running...';
+    panel.style.display = 'block';
+    status.textContent = 'Executing...';
+    status.className = 'output-status running';
+    stdout.textContent = '';
+    stderr.textContent = '';
+
+    fetch('/run/{{ project.name }}/{{ file_info.filename }}', { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.textContent = '\u25B6 Run Code';
+            if (data.success) {
+                status.textContent = 'Success (exit code: 0)';
+                status.className = 'output-status success';
+            } else {
+                status.textContent = 'Failed (exit code: ' + data.return_code + ')';
+                status.className = 'output-status error';
+            }
+            stdout.textContent = data.stdout || '(no output)';
+            if (data.stderr) {
+                stderr.textContent = data.stderr;
+                stderr.style.display = 'block';
+            } else {
+                stderr.style.display = 'none';
+            }
+        })
+        .catch(err => {
+            btn.disabled = false;
+            btn.textContent = '\u25B6 Run Code';
+            status.textContent = 'Error: ' + err.message;
+            status.className = 'output-status error';
+        });
+}
+</script>
+{% endif %}
+{% endblock %}

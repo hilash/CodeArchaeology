@@ -1,0 +1,32 @@
+{
+  "2006-03-14_hw1": {
+    "summary": "C++ OOP assignment implementing a doubly-linked list of Person objects with comparison operators and bubble sort.",
+    "explanation": "This project implements a `Person` class storing first name, last name, and age, with full comparison operator overloading (`==`, `!=`, `<`, `>`, `<=`, `>=`) that compares lexicographically by last name, then first name, then age.\n\nA doubly-linked `List` class provides `InsertFront`, `InsertBack`, `RemoveFront`, `RemoveBack`, `Find`, `Remove`, and `Sort` (bubble sort) operations. The sort orders Person objects using the overloaded comparison operators.\n\nThe project also includes a small C program that prints an ASCII stick figure using `printf` — likely an earlier introductory exercise bundled with the submission.",
+    "clean_title": "HW1 — Linked List of Persons",
+    "topics": ["doubly-linked list", "operator overloading", "bubble sort", "C++ OOP"]
+  },
+  "2006-03-22_hw2": {
+    "summary": "C++ OOP assignment building an animal classification hierarchy with polymorphism, stored in a sorted linked list.",
+    "explanation": "This project implements a deep class hierarchy modeling different animal types:\n\n- **Animals** (abstract base): name, age, virtual `Print()`, pure virtual `CalculatedAge()`\n- **Mammals** → Cat (age formula: 16/24/+4 per year), Elephant (1:1)\n- **Reptiles** → Snake (age × 5), Crocodile (age × 0.75)\n- **Birds** → Eagle (age × 2), Parrot (age × 4)\n\nAnimals are stored in a doubly-linked list sorted by class type (Mammals < Reptiles < Birds), then by name. A `ListPointer` iterator class provides `*`, `++`, `--` operators for traversal. The `FindOlder()` function uses the iterator to find animals exceeding a human-years age threshold.\n\nAlso includes a small C currency converter (dollars ↔ shekels) from an earlier exercise.",
+    "clean_title": "HW2 — Animal Class Hierarchy",
+    "topics": ["inheritance", "polymorphism", "virtual functions", "iterator pattern", "C++ OOP"]
+  },
+  "2006-03-25_hw3": {
+    "summary": "C program that decodes a 4-digit military intelligence code into army strength and risk level.",
+    "explanation": "This program reads a 4-character code where each digit encodes military data:\n\n- Digit 1: Combat fitness level (1–9)\n- Digit 2: Soldiers in ten-thousands (0–9)\n- Digit 3: Soldiers in thousands (0–9); digits 2+3 cannot both be 0\n- Digit 4: Tanks in hundreds (0–9)\n\nThe program validates each digit, decodes the army order (tank count, soldier count, fitness level), then calculates a risk assessment:\n\n- **High risk**: tanks ≥ 700 AND soldiers ≥ 60,000 AND fitness ≥ 7, OR tanks = 900 AND soldiers ≥ 80,000\n- **Medium risk**: tanks 300–699, soldiers 30,000–59,999, fitness 3–6\n- **Low risk**: tanks < 300, soldiers < 30,000, fitness < 3\n\nUses character-based input with ASCII arithmetic (`- 48`) for char-to-int conversion.",
+    "clean_title": "HW3 — Army Code Decoder",
+    "topics": ["input validation", "conditional logic", "character I/O", "C programming"]
+  },
+  "2006-04-06_hw4": {
+    "summary": "C program that prints a fractal-like Sierpinski triangle pattern using deeply nested loops.",
+    "explanation": "Given two numbers `n` (big triangle base) and `k` (small triangle base), the program prints an ASCII art pattern forming a large triangle composed of smaller sub-triangles — resembling a Sierpinski triangle.\n\nThe algorithm validates that `k` is odd and that `n` is properly divisible into `r` rows of sub-triangles (`n = k * r + r - 1`). It then uses 6 levels of nested loops to:\n\n1. Iterate over each row of sub-triangles\n2. Iterate over each line within a sub-triangle\n3. Print leading spaces (decreasing per line)\n4. Repeat the sub-triangle pattern across the row\n5. Print asterisks and inter-triangle spacing\n\nThis produces a fractal-like recursive pattern using pure iteration.",
+    "clean_title": "HW4 — Fractal Triangle Pattern",
+    "topics": ["nested loops", "ASCII art", "pattern printing", "C programming"]
+  },
+  "2006-04-06_unnamed": {
+    "summary": "Multi-project bundle: a full two-pass assembler for a custom assembly language, a Python UDP remote mouse controller, and a triangle pattern draft.",
+    "explanation": "This email contained three distinct codebases:\n\n### HartaAssembler (C)\nA complete two/three-pass assembler that reads `.as` assembly source files and produces `.ob` object files (in base-6/heximal encoding), `.ent` entry point files, and `.ext` external reference files. Key features:\n- Supports instructions: MOV, CMP, ADD, SUB, NOT, CLR, LEA, INC, DEC, JMP, BNE, RED, PRN, JSR, RTS, STOP\n- Addressing modes: immediate, direct, index, register (R0–R7)\n- Symbol table with external references\n- Three-pass design: (0) collect data references, (1) link symbols and resolve addresses, (2) generate machine code output\n\n### Socket Server (Python 2)\nA UDP server that receives accelerometer data from an Android device and translates it into mouse movements/clicks on the host computer using PyMouse.\n\n### Triangle Pattern (C)\nAn earlier draft of the fractal triangle printer (same as HW4).",
+    "clean_title": "HartaAssembler + Remote Mouse Controller",
+    "topics": ["assembler", "two-pass compilation", "symbol table", "UDP networking", "C programming", "Python"]
+  }
+}

@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.name }} - Gmail{% endblock %}
+
+{% block search_bar %}
+<div class="gmail-search">
+    <form method="get" action="/" style="display:flex;align-items:center;gap:4px;">
+        <input type="text" name="q" value="" placeholder="">
+        <button type="submit" class="gmail-search-btn">Search Mail</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block sidebar_extra %}
+{% endblock %}
+
+{% block content %}
+<div class="gmail-detail-container">
+
+<!-- Gmail email action bar -->
+<div class="email-action-bar">
+    <a href="/" class="back-link">&laquo; Back to Inbox</a>
+    <div class="email-action-buttons">
+        {% if prev_name %}<a href="/project/{{ prev_name }}" class="gmail-action-btn" id="prev-btn">&lsaquo; Newer</a>{% endif %}
+        {% if next_name %}<a href="/project/{{ next_name }}" class="gmail-action-btn" id="next-btn">Older &rsaquo;</a>{% endif %}
+        <form method="post" action="/delete/{{ project.name }}" onsubmit="return confirm('Delete this project permanently?');" style="display:inline;">
+            <button type="submit" class="gmail-action-btn" style="color:var(--gmail-red);">Delete</button>
+        </form>
+    </div>
+</div>
+
+<!-- Subject line (like Gmail email subject) -->
+<div class="email-subject-bar">
+    <h1 class="email-subject">{% if project.enrichment and project.enrichment.clean_title %}{{ project.enrichment.clean_title }}{% else %}{{ project.name.split('_', 1)[1].replace('-', ' ').title() if '_' in project.name else project.name }}{% endif %}</h1>
+    {% set all_tags = [] %}
+    {% if project.enrichment and project.enrichment.topics %}
+        {% for topic in project.enrichment.topics %}
+            {% if all_tags.append(topic) %}{% endif %}
+        {% endfor %}
+    {% endif %}
+    {% if project.languages %}
+        {% for lang in project.languages %}
+            {% if lang not in all_tags %}
+                {% if all_tags.append(lang) %}{% endif %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    {% if all_tags %}
+    <div class="email-labels">
+        {% for t in all_tags %}
+        <span class="email-label">{{ t }}</span>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- Sender info (like Gmail email header) -->
+<div class="email-message">
+    <div class="email-sender-bar">
+        <div class="email-sender-left">
+            <span class="email-sender-avatar">{{ (project.emails[0].sender|default('?'))[0]|upper if project.emails else '?' }}</span>
+            <div class="email-sender-info">
+                <div class="email-sender-name">
+                    <strong>{% if project.emails %}{{ project.emails[0].sender|default('Unknown') }}{% else %}Unknown{% endif %}</strong>
+                    {% if project.emails and project.emails[0].recipients %}
+                    <span class="email-sender-to">to {{ project.emails[0].recipients }}</span>
+                    {% endif %}
+                </div>
+                <div class="email-sender-subject">
+                    {% if project.emails %}{{ project.emails[0].subject|default('(no subject)') }}{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="email-date">
+            {% if project.emails %}{{ project.emails[0].date|default('') }}{% endif %}
+        </div>
+    </div>
+
+    <!-- Message body -->
+    <div class="email-message-body">
+        {% if project.enrichment and project.enrichment.explanation %}
+            {{ project.enrichment.explanation|e }}
+        {% elif project.enrichment and project.enrichment.summary %}
+            {{ project.enrichment.summary|e }}
+        {% elif project.emails and project.emails[0].body %}
+            {{ project.emails[0].body|e }}
+        {% else %}
+            (no message body)
+        {% endif %}
+    </div>
+
+    {% if project.enrichment and project.enrichment.euler_problems %}
+    <div class="email-euler-box">
+        <strong>Project Euler:</strong> {{ project.enrichment.euler_problems|e }}
+        {% if project.enrichment.euler_links %}
+        <div class="euler-links">
+            {% for link in project.enrichment.euler_links %}
+            <a href="{{ link }}" target="_blank">{{ link }}</a>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Attachments (files styled like Gmail attachment cards) -->
+    {% if project.files %}
+    <div class="email-attachments">
+        <div class="email-attachments-header">
+            <span class="attachment-icon">&#128206;</span> {{ project.files|length }} attachment{{ 's' if project.files|length != 1 }}
+        </div>
+        <div class="email-attachment-list">
+            {% for file in project.files %}
+            <div class="file-expandable">
+                <div class="email-attachment-card" data-project="{{ project.name }}" data-filename="{{ file.filename }}">
+                    <div class="attachment-card-icon">&#128196;</div>
+                    <div class="attachment-card-info">
+                        <div class="attachment-card-name">{{ file.filename }}</div>
+                        <div class="attachment-card-size">{{ (file.size / 1024)|round(1) }} KB</div>
+                    </div>
+                    <a href="/view/{{ project.name }}/{{ file.filename }}" class="attachment-open-link" onclick="event.stopPropagation();">Open &rsaquo;</a>
+                    <span class="file-lang">{{ file.filename.rsplit('.', 1)[1] if '.' in file.filename else '?' }}</span>
+                </div>
+                <div class="file-content-area" style="display:none;"></div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Gmail-style reply/forward bar -->
+    <div class="email-reply-bar">
+        {% if prev_name %}<a href="/project/{{ prev_name }}" class="gmail-action-btn">&lsaquo; Newer</a>{% endif %}
+        {% if next_name %}<a href="/project/{{ next_name }}" class="gmail-action-btn">Older &rsaquo;</a>{% endif %}
+    </div>
+</div>
+
+{% if project.emails|length > 1 %}
+<div class="email-thread-section">
+    <div class="email-thread-header">{{ project.emails|length }} messages in this thread</div>
+    {% for email in project.emails[1:] %}
+    <div class="email-thread-item">
+        <strong>{{ email.subject }}</strong>
+        <span class="email-thread-meta">{{ email.sender }} &mdash; {{ email.date }}</span>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('keydown', function(e) {
+    if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+    if (e.key === 'ArrowLeft') {
+        var prev = document.getElementById('prev-btn');
+        if (prev) window.location.href = prev.href;
+    } else if (e.key === 'ArrowRight') {
+        var next = document.getElementById('next-btn');
+        if (next) window.location.href = next.href;
+    }
+});
+
+/* Expandable file content */
+var imgExts = ['.jpg','.jpeg','.png','.gif','.bmp','.svg','.webp'];
+var fileItems = document.querySelectorAll('.email-attachment-card');
+
+fileItems.forEach(function(item) {
+    item.style.cursor = 'pointer';
+    item.addEventListener('click', function() {
+        var area = item.closest('.file-expandable').querySelector('.file-content-area');
+        if (!area) return;
+        if (area.style.display !== 'none') {
+            area.style.display = 'none';
+            item.classList.remove('attachment-active');
+        } else {
+            area.style.display = 'block';
+            item.classList.add('attachment-active');
+        }
+    });
+});
+
+/* Load and expand all files on page load with a single API call */
+var projectName = fileItems.length > 0 ? fileItems[0].getAttribute('data-project') : null;
+if (projectName) {
+    fetch('/api/project/' + encodeURIComponent(projectName))
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            var fileMap = {};
+            data.files.forEach(function(f) { fileMap[f.filename] = f; });
+
+            fileItems.forEach(function(item) {
+                var wrapper = item.closest('.file-expandable');
+                var area = wrapper.querySelector('.file-content-area');
+                if (!area) return;
+                var filename = item.getAttribute('data-filename');
+                var ext = filename.substring(filename.lastIndexOf('.')).toLowerCase();
+
+                if (imgExts.indexOf(ext) !== -1) {
+                    area.innerHTML = '<div class="file-preview-img"><img src="/raw/' + encodeURIComponent(projectName) + '/' + encodeURIComponent(filename) + '" alt="' + filename + '"></div>';
+                } else {
+                    var file = fileMap[filename];
+                    if (!file || file.binary) {
+                        area.innerHTML = '<div class="file-preview-loading">' + (file ? 'Binary file' : 'File not found') + '</div>';
+                    } else if (!file.content) {
+                        area.innerHTML = '<div class="file-preview-loading">Empty file</div>';
+                    } else {
+                        var langClass = file.language ? ' class="language-' + file.language.toLowerCase() + '"' : '';
+                        area.innerHTML = '<pre class="file-preview-code"><code' + langClass + '>' + escapeHtml(file.content) + '</code></pre>';
+                        area.querySelectorAll('pre code').forEach(function(block) { hljs.highlightElement(block); });
+                        addRunButton(area, projectName, filename, file.content);
+                    }
+                }
+
+                area.setAttribute('data-loaded', '1');
+                area.style.display = 'block';
+                item.classList.add('attachment-active');
+            });
+        })
+        .catch(function() {
+            fileItems.forEach(function(item) {
+                var wrapper = item.closest('.file-expandable');
+                var area = wrapper.querySelector('.file-content-area');
+                if (area) area.innerHTML = '<div class="file-preview-loading">Failed to load</div>';
+            });
+        });
+}
+
+function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+</script>
+{% endblock %}
